@@ -133,7 +133,7 @@ if grade!='Select Grade':
     
         
         for i in top_2_indices:
-                  if data['Gender'].iloc[i] != data['Gender'].iloc['user_name'] and data['Name'].iloc[i] != name:
+                  if data['Gender'].iloc[i] != data['Gender'].iloc[user_name] and data['Name'].iloc[i] != name:
                     with col2:
                           
                         
