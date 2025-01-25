@@ -134,17 +134,17 @@ if grade!='Select Grade':
         
         for i in top_2_indices:
             
-            if data['Name'].iloc[i]==name and data['Gender'].iloc[i]==gender:
-                  continue
-            with col2:
-             st.markdown("#### Meet Your Match!!")
-             st.write(f"Name: {data['Name'].iloc[i]}")
-             st.write(f"Age: {data['Age'].iloc[i]}")
-             st.write(f"Gender: {data['Gender'].iloc[i]}")
-             st.write(f"Hobbies: {data['Hobbies'].iloc[i]}")
-             st.write(f"Communication: {data['Communication'].iloc[i]}")
-             st.write(f"Favorite Subject: {data['Fav_sub'].iloc[i]}")
-             st.write(f"Favorite Singer: {data['Fav_singer'].iloc[i]}")
-             st.write(f"Grade: {data['Grade'].iloc[i]}")
-             t.sleep(2)
+            if data['Name'].iloc[i]!=name and data['Gender'].iloc[i]!=gender:
+                  
+                  with col2:
+                    st.markdown("#### Meet Your Match!!")
+                    st.write(f"Name: {data['Name'].iloc[i]}")
+                    st.write(f"Age: {data['Age'].iloc[i]}")
+                    st.write(f"Gender: {data['Gender'].iloc[i]}")
+                    st.write(f"Hobbies: {data['Hobbies'].iloc[i]}")
+                    st.write(f"Communication: {data['Communication'].iloc[i]}")
+                    st.write(f"Favorite Subject: {data['Fav_sub'].iloc[i]}")
+                    st.write(f"Favorite Singer: {data['Fav_singer'].iloc[i]}")
+                    st.write(f"Grade: {data['Grade'].iloc[i]}")
+                    t.sleep(2)
         st.markdown("##### SCROLL UP")     
