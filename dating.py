@@ -19,7 +19,6 @@ Fav_sub = []
 Fav_singer = []
 Grade = []
 
-# We need to handle inputs in a loop but assign unique keys to each input field
 
 data = pd.read_csv("match.csv")
 st.info("Make sure to fill out all the information in sequence.")
