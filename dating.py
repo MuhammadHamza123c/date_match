@@ -114,7 +114,7 @@ if grade!='Select Grade':
         # Sort and get the top 2 recommended matches
         indexed_arr = list(enumerate(similarities))
         sorted_indexed_arr = sorted(indexed_arr, key=lambda x: x[1], reverse=True)
-        top_2_indices = [index for index, value in sorted_indexed_arr[:4]]
+        top_2_indices = [index for index, value in sorted_indexed_arr[:5]]
         st.markdown("##### IT WILL TAKE US FEW SECONDS TO FIND YOUR MATCH MAKER😉.......")
         t.sleep(3)
         with col1:
