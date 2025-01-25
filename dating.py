@@ -134,7 +134,7 @@ if grade!='Select Grade':
         
         for i in top_2_indices:
             
-            if data['Name'].iloc[i]==name:
+            if data['Name'].iloc[i]==name and data['Gender'].iloc[i]==data['Gender'].iloc[i]:
                   continue
             with col2:
              st.markdown("#### Meet Your Match!!")
