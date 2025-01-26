@@ -151,5 +151,5 @@ if grade!='Select Grade':
                            st.write(f"Favorite Subject: {data['Fav_sub'].iloc[i]}")
                            st.write(f"Favorite Singer: {data['Fav_singer'].iloc[i]}")
                            st.write(f"Grade: {data['Grade'].iloc[i]}")
-                    t.sleep(2)
+                           t.sleep(2)
         st.markdown("##### SCROLL UP")     
