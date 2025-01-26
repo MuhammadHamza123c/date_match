@@ -133,8 +133,9 @@ if grade!='Select Grade':
     
         
         for i in top_2_indices:
-                  if data['Gender'].iloc[i] != data['Gender'].iloc[user_name]:
-                    with col2:
+                  if data['Gender'].iloc[i] == data['Gender'].iloc[user_name]:
+                      continue
+                  with col2:
                           
                         
                        
