@@ -3,155 +3,131 @@ import streamlit as st
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 import time as t
-col1,col2=st.columns(2)
 
-
+col1, col2 = st.columns(2)
 vector = TfidfVectorizer()
 
 st.markdown("# MATCH MAKER 🤝💕")
 
-Name = []
-Age = []
-Gender=[]
-Hobbies=[]
-Communication = []
-Fav_sub = []
-Fav_singer = []
-Grade = []
+# Initialize session state
+if 'submitted' not in st.session_state:
+    st.session_state.submitted = False
 
-
+# Load existing data
 data = pd.read_csv("match.csv")
 st.info("Make sure to fill out all the information in sequence.")
 
-st.markdown("###### Write down Name here: ")
-    # Create a unique key by including the field name
-name = st.text_input("", key=f"name_input_{len(Name)}")
-if name:
-      Name.append(name)
+# Collect user input
+with st.form("user_form"):
+    st.markdown("###### Write down Name here: ")
+    name = st.text_input("", key="name_input")
 
-st.markdown("###### Write down age here: ")
-age = st.number_input("", key=f"age_input_{len(Age)}",format="%d",step=1)
-if age:
-     
-     Age.append(age)
+    st.markdown("###### Write down age here: ")
+    age = st.number_input("", key="age_input", format="%d", step=1)
 
-st.markdown("###### Write down gender here: ")
+    st.markdown("###### Write down gender here: ")
+    gender = st.radio("", ['Male', 'Female'], index=0, key="gender_radio")
 
-gender=st.radio(
-   "",
-   ['Select Gender','Male','Female'],
-   index=0
-)
-if gender!='Select Gender':
-   Gender.append(gender)
+    st.markdown("###### Write down hobbies here: ")
+    hobbies = st.text_input("", key="hobbies_input")
 
-st.markdown("###### Write down hobbies here: ")
+    st.markdown("###### How would you describe your communication style?")
+    comm = st.radio('', ['Direct and to the point', 'Friendly and chatty', 
+                        'Calm and thoughtful', 'Depends on the situation'], index=0, key="comm_radio")
 
-hobbies=st.text_input("")
-if hobbies:
-        Hobbies.append(hobbies)
+    st.markdown("###### Write down Your Favorite Subject here: ")
+    fav_subject = st.text_input("", key="fav_sub_input")
 
-st.markdown("###### How would you describe your communication style?")   
-comm = st.radio(
-   '',
-   ['Select Communication Style','Direct and to the point','Friendly and chatty','Calm and thoughtful','Depends on the situation'],
-   index=0
-)
-if comm!='Select Communication Style':
+    st.markdown("###### Write down Your Favorite Singer here: ")
+    fav_singer = st.text_input("", key="fav_singer_input")
 
- Communication.append(comm)
+    st.markdown("###### Write down Grade here: ")
+    grade = st.radio("", ['A', 'B', 'C', 'D', 'F'], index=0, key="grade_radio")
 
-st.markdown("###### Write down Your Favorite Subject here: ")
+    submitted = st.form_submit_button("Find Matches!")
+
+if submitted:
+    st.session_state.submitted = True
+    # Create new entry
+    new_entry = pd.DataFrame([{
+        'Name': name,
+        'Age': age,
+        'Gender': gender,
+        'Hobbies': hobbies,
+        'Communication': comm,
+        'Fav_sub': fav_subject,
+        'Fav_singer': fav_singer,
+        'Grade': grade
+    }])
+
+    # Update dataset
+    data = pd.concat([data, new_entry], ignore_index=True)
+    data.to_csv("match.csv", index=False)
+
+    # Prepare data for similarity
+    combined_features = (
+        data['Age'].astype(str) + ' ' +
+        data['Gender'] + ' ' +
+        data['Hobbies'] + ' ' +
+        data['Communication'] + ' ' +
+        data['Fav_singer'] + ' ' +
+        data['Fav_sub'] + ' ' +
+        data['Grade']
+    )
+
+    # Calculate similarity
+    tfidf_matrix = vector.fit_transform(combined_features)
+    cosine_sim = cosine_similarity(tfidf_matrix)
     
-Fav_subject = st.text_input("", key=f"fav_sub_input_{len(Fav_sub)}")
+    # Get current user index
+    user_index = data[data['Name'] == name].index[0]
+    
+    # Get similarity scores
+    sim_scores = list(enumerate(cosine_sim[user_index]))
+    
+    # Filter out user and same gender
+    opposite_gender = 'Female' if gender == 'Male' else 'Male'
+    filtered_scores = [
+        (i, score) for i, score in sim_scores 
+        if i != user_index and data.iloc[i]['Gender'] == opposite_gender
+    ]
+    
+    # Sort by score
+    filtered_scores = sorted(filtered_scores, key=lambda x: x[1], reverse=True)
+    
+    # Get top 2 matches
+    top_indices = [i for i, _ in filtered_scores[:2]]
 
-if Fav_subject:
-        Fav_sub.append(Fav_subject)
-st.markdown("###### Write down Your Favorite Singer here:  ")
+    # Display results
+    st.markdown("##### IT WILL TAKE US FEW SECONDS TO FIND YOUR MATCH MAKER😉.......")
+    t.sleep(3)
     
-Fav_singerr = st.text_input("", key=f"fav_singer_input_{len(Fav_singer)}")
+    with col1:
+        st.markdown("#### You!!")
+        st.write(f"Name: {name}")
+        st.write(f"Age: {age}")
+        st.write(f"Gender: {gender}")
+        st.write(f"Hobbies: {hobbies}")
+        st.write(f"Communication: {comm}")
+        st.write(f"Favorite Subject: {fav_subject}")
+        st.write(f"Favorite Singer: {fav_singer}")
+        st.write(f"Grade: {grade}")
 
-if Fav_singerr:
-     
-       Fav_singer.append(Fav_singerr)
-st.markdown("###### Write down Grade here: ")
-    
-grade = st.radio(
-   "",
-   ['Select Grade','A','B','C','D','F'],
-   index=0
-)
-if grade!='Select Grade':
-        Grade.append(grade)
-    
-        # Add the new data to the DataFrame
-        dataset = pd.DataFrame({
-            'Name': Name,
-            'Age': Age,
-            'Gender':Gender,
-            'Hobbies':Hobbies,
-            'Communication': Communication,
-            'Fav_sub': Fav_sub,
-            'Fav_singer': Fav_singer,
-            'Grade': Grade
-        })
-    
-        data = pd.concat([data, dataset], ignore_index=True)
-    
-        # Save the updated data to the CSV file
-        data.to_csv("match.csv", index=False)
-    
-        # Create a string combining all the features for similarity calculation
-        changing = data['Age'].astype(str) + '' +data['Gender'].astype(str)+ '' +data['Hobbies']+ '' +data['Communication'].astype(str) + '' + data['Fav_singer'].astype(str) + '' + data['Fav_sub'].astype(str) + '' + data['Grade'].astype(str)
-        change_data = vector.fit_transform(changing)
-        matrix = change_data.toarray()
-    
-        # Calculate cosine similarity
-        similar = cosine_similarity(matrix)
-        user_name = data[data['Name'] == name].index[0]
-        similarities = similar[user_name]
-    
-        # Sort and get the top 2 recommended matches
-        indexed_arr = list(enumerate(similarities))
-        sorted_indexed_arr = sorted(indexed_arr, key=lambda x: x[1], reverse=True)
-        top_2_indices = [index for index, value in sorted_indexed_arr[:2]]
-        st.markdown("##### IT WILL TAKE US FEW SECONDS TO FIND YOUR MATCH MAKER😉.......")
-        t.sleep(3)
-        with col1:
-               st.markdown("#### You!!")
-               st.write(f"Name: {data['Name'].iloc[user_name]}")
-               st.write(f"Age: {data['Age'].iloc[user_name]}")
-               st.write(f"Gender: {data['Gender'].iloc[user_name]}")
-               st.write(f"Hobbies: {data['Hobbies'].iloc[user_name]}")
-               st.write(f"Communication: {data['Communication'].iloc[user_name]}")
-               st.write(f"Favorite Subject: {data['Fav_sub'].iloc[user_name]}")
-               st.write(f"Favorite Singer: {data['Fav_singer'].iloc[user_name]}")
-               st.write(f"Grade: {data['Grade'].iloc[user_name]}")
-        
-              
+    with col2:
+        if top_indices:
+            st.markdown("#### Top Matches")
+            for idx in top_indices:
+                match = data.iloc[idx]
+                st.write("---")
+                st.write(f"Name: {match['Name']}")
+                st.write(f"Age: {match['Age']}")
+                st.write(f"Gender: {match['Gender']}")
+                st.write(f"Hobbies: {match['Hobbies']}")
+                st.write(f"Communication: {match['Communication']}")
+                st.write(f"Favorite Subject: {match['Fav_sub']}")
+                st.write(f"Favorite Singer: {match['Fav_singer']}")
+                st.write(f"Grade: {match['Grade']}")
+        else:
+            st.warning("No suitable matches found!")
 
-    
-        
-        for i in top_2_indices:
-                  
-                  if data['Gender'].iloc[i] == data['Gender'].iloc[user_name]:
-                      continue
-                  with col2:
-                           
-                          
-                        
-                       
-
-                  
-                  
-                           st.markdown("#### Meet Your Match!!")
-                           st.write(f"Name: {data['Name'].iloc[i]}")
-                           st.write(f"Age: {data['Age'].iloc[i]}")
-                           st.write(f"Gender: {data['Gender'].iloc[i]}")
-                           st.write(f"Hobbies: {data['Hobbies'].iloc[i]}")
-                           st.write(f"Communication: {data['Communication'].iloc[i]}")
-                           st.write(f"Favorite Subject: {data['Fav_sub'].iloc[i]}")
-                           st.write(f"Favorite Singer: {data['Fav_singer'].iloc[i]}")
-                           st.write(f"Grade: {data['Grade'].iloc[i]}")
-                           t.sleep(2)
-        st.markdown("##### SCROLL UP")     
+    st.markdown("##### SCROLL UP")
